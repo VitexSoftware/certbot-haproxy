@@ -2,7 +2,7 @@
 
 
 String[] architectures = []
-String[] distributions = ['debian:bullseye', 'debian:bookworm', 'ubuntu:focal', 'ubuntu:hirsute', 'ubuntu:impish', 'ubuntu:jammy']
+String[] distributions = ['debian:buster', 'debian:bullseye', 'debian:bookworm', 'ubuntu:focal', 'ubuntu:hirsute', 'ubuntu:impish', 'ubuntu:jammy']
 
 String vendor = 'vitexsoftware'
 String distribution = ''
