@@ -1,0 +1,6 @@
+certbot-haproxy (0.1) UNRELEASED; urgency=low
+
+  * Initial release. Closes: #nnnn
+    <nnnn is the bug number of your ITP>
+
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sun, 19 Jun 2022 22:52:11 +0200
