@@ -46,3 +46,5 @@ certbot.log
 # tmp files:
 *.swp
 
+debian/certbot-haproxy/
+debian/files
