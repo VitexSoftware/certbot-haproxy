@@ -9,7 +9,7 @@ Homepage: https://github.com/VitexSoftware/certbot-haproxy
 #Vcs-Browser: https://salsa.debian.org/debian/certbot-haproxy
 
 Package: certbot-haproxy
-Architecture: any
+Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends}, haproxy, certbot
 	${shlibs:Depends}
