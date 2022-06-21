@@ -49,7 +49,7 @@ def create_self_signed_cert(bits=2048, **kwargs):
     cert = crypto.X509()
 
     attributes = {
-        'countryName': u"FU",
+        'countryName': u"UK",
         'stateOrProvinceName': u"Oceania",
         'localityName': u"London",
         'organizationName': u"Ministry of Truth",

@@ -52,7 +52,7 @@ import zope.interface
 from acme import challenges
 
 from certbot import interfaces
-from certbot.plugins import standalone
+from certbot._internal.plugins import standalone
 
 logger = logging.getLogger(__name__)  # pylint:disable=invalid-name
 
