@@ -21,5 +21,7 @@ override_dh_auto_build:
 override_dh_install:
 	dh_install
 	mv debian/certbot-haproxy/usr/lib/python* debian/certbot-haproxy/usr/lib/python3
+	rm debian/certbot-haproxy/usr/lib/python3/dist-packages/certbot_haproxy/__pycache__/ -rf
+	rm debian/certbot-haproxy/usr/lib/python3/dist-packages/certbot_haproxy/tests/__pycache__/ -rf
 	mv debian/certbot-haproxy/usr/bin/certbot-deploy-hook-example	debian/certbot-haproxy/usr/bin/certbot-haproxy-deploy
 	chmod +x debian/certbot-haproxy/usr/bin/certbot-haproxy-deploy
