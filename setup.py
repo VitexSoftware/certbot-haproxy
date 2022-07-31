@@ -4,7 +4,7 @@ from setuptools import setup
 from setuptools import find_packages
 
 own_version = '0.2.1'
-certbot_version = '1.29.0'
+certbot_version = '1.12.0'
 
 # Please update tox.ini when modifying dependency version requirements
 install_requires = [
