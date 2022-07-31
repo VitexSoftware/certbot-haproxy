@@ -9,8 +9,14 @@ export PYBUILD_NAME=cerbot-haproxy
 export PYBUILD_DISABLE=test/python3
 export SETUPTOOLS_USE_DISTUTILS=stdlib pipenv install
 
+BUILDDIR3 := $(shell pybuild --print build_dir --interpreter python3)
+
 %:
 	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_build:
+	dh_auto_build
+	PYTHONPATH=$(BUILDDIR3) python3 setup.py build_sphinx
 
 override_dh_install:
 	dh_install
