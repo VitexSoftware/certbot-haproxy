@@ -12,7 +12,7 @@ install_requires = [
     'certbot>={0}'.format(certbot_version),
     # For pkg_resources. >=1.0 so pip resolves it to a version cryptography
     # will tolerate; see #2599:
-    'setuptools>=41.6.0'
+    'setuptools>=41.6.0',
     'zope.component',
     'zope.interface',
     'future',
