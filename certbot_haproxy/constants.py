@@ -10,6 +10,7 @@ e.g.: `CLI_DEFAULTS_DEBIAN_JESSIE`. Currently these are defined for:
   - Ubuntu Vivid (15.04)
   - Ubuntu Wily (15.10)
   - Ubuntu Xenial (16.04)
+  - Centos (7)
 
 You can define new lists below following the instructions hereafter, please
 consider making a pull-request when you do so, so others may benefit of your
@@ -57,8 +58,8 @@ from certbot import errors
 from certbot_haproxy.util import MemoiseNoArgs
 
 RE_HAPROXY_DOMAIN_ACL = re.compile(
-    r'\s*acl (?P<name>[0-9a-z_\-.]+) '
-    r'hdr\(host\) -i '
+    r'\s*acl\s+(?P<name>[0-9a-z_\-.]+)\s+'
+    r'(?:hdr\(host\)|req\.ssl_sni)\s+-i\s+'
     r'(?P<domain>'  # Start group "domain"
     r'(?:[0-9-a-z](?:[a-z0-9-]{0,61}[a-z0-9]\.)+)'  # (sub-)domain parts
     r'(?:[0-9-a-z](?:[a-z0-9-]{0,61}[a-z0-9]))'  # TLD part
@@ -80,6 +81,18 @@ CLI_DEFAULTS_DEBIAN_BASED_PRE_SYSTEMD_OS = dict(
     service_manager='service',
     version_cmd=['/usr/sbin/haproxy', '-v'],
     restart_cmd=['service', 'haproxy', 'restart'],
+    # Needs the config file as an argument:
+    conftest_cmd=['/usr/sbin/haproxy', '-c', '-f'],
+    haproxy_config='/etc/haproxy/haproxy.cfg',
+    # Needs to be writeable by the user that will run certbot
+    crt_directory='/opt/certbot/haproxy_fullchains',
+)
+
+
+CLI_DEFAULTS_RHEL_BASED_SYSTEMD_OS = dict(
+    service_manager='systemctl',
+    version_cmd=['/usr/sbin/haproxy', '-v'],
+    restart_cmd=['sudo', 'systemctl', 'restart', 'haproxy'],
     # Needs the config file as an argument:
     conftest_cmd=['/usr/sbin/haproxy', '-c', '-f'],
     haproxy_config='/etc/haproxy/haproxy.cfg',
@@ -109,6 +122,10 @@ CLI_DEFAULTS = {
         '18.04': CLI_DEFAULTS_DEBIAN_BASED_SYSTEMD_OS,
         '18.10': CLI_DEFAULTS_DEBIAN_BASED_SYSTEMD_OS,
         '19.04': CLI_DEFAULTS_DEBIAN_BASED_SYSTEMD_OS
+    },
+    "centos": {
+        '_min_version': '7',
+        '7': CLI_DEFAULTS_RHEL_BASED_SYSTEMD_OS
     }
 }
 

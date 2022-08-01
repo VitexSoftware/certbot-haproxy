@@ -53,13 +53,14 @@ from acme import challenges
 
 from certbot import interfaces
 from certbot.plugins import common
+from certbot._internal.plugins import standalone
 
 logger = logging.getLogger(__name__)  # pylint:disable=invalid-name
 
 
 @zope.interface.implementer(interfaces.IAuthenticator)
 @zope.interface.provider(interfaces.IPluginFactory)
-class HAProxyAuthenticator(common.Plugin, interfaces.Authenticator):
+class HAProxyAuthenticator(standalone.Authenticator):
     """HAProxy Authenticator."""
 
     description = "Certbot standalone authenticator with HAProxy preset."

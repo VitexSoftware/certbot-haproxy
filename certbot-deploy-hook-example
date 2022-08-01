@@ -42,6 +42,8 @@ with open(deploy_path, "w") as deploy, \
 # Here you can add your service reload command. Which will be executed after
 # every renewal, which is fine if you only have a few domains.
 
+os.system('sudo /bin/systemctl restart haproxy')
+
 # Alternative is to add the reload to the --post-hook. In that case it is only
 # run once after all renewals. That would be the use-case if you have a large
 # number of different certificates served by HAproxy.
