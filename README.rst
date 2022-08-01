@@ -100,8 +100,14 @@ Now update, upgrade and install some requirements:
         python python-setuptools \
         haproxy python3-pip python3-setuptools
 
-    easy_install pip
-    pip install --upgrade setuptools
+    sudo apt install lsb-release wget apt-transport-https bzip2
+
+    wget -qO- https://repo.vitexsoftware.com/pubkey.gpg | sudo tee /etc/apt/trusted.gpg.d/vitexsoftware.gpg
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/vitexsoftware.gpg]  https://repo.vitexsoftware.com  $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/vitexsoftware.list
+    sudo apt update
+
+    sudo apt install certbot-haproxy
+
 
 We also installed a simple firewall above, but it is not yet configured, let's
 do that now:
