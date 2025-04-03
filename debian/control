@@ -11,8 +11,8 @@ Homepage: https://github.com/VitexSoftware/certbot-haproxy
 Package: certbot-haproxy
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, haproxy, certbot, python3, python3-setuptools,  python3-mock, python3-future
-	${shlibs:Depends}
+Depends: ${misc:Depends}, haproxy, certbot, python3, python3-setuptools,  python3-mock, python3-future, python3-zope.component
+    ${shlibs:Depends}
 Description: HAProxy plugin for Let's Encrypt's Certbot 
  This is a certbot plugin for using certbot in combination with a HAProxy setup. 
  Its advantage over using the standalone certbot is that it automatically places
