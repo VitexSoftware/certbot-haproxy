@@ -1,27 +1,24 @@
 #!/usr/bin/make -f
-# You must remove unused comment lines for the released package.
-#export DH_VERBOSE = 1
-#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
-#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+export PYBUILD_NAME=certbot-haproxy
+#export PYBUILD_SYSTEM=custom
+#export PYBUILD_BUILD_ARGS=python3 setup.py build
+#export PYBUILD_INSTALL_ARGS=install --root=$(CURDIR)/debian/tmp
+#export PYBUILD_CLEAN_ARGS=python3 setup.py clean
 
-export PYBUILD_NAME=cerbot-haproxy
-export PYBUILD_DISABLE=test/python3
-export SETUPTOOLS_USE_DISTUTILS=stdlib pipenv install
-
-BUILDDIR3 := $(shell pybuild --print build_dir --interpreter python3)
+include /usr/share/dpkg/pkg-info.mk
 
 %:
 	dh $@ --with python3 --buildsystem=pybuild
 
-override_dh_auto_build:
-	dh_auto_build
-	PYTHONPATH=$(BUILDDIR3) python3 setup.py build_sphinx
+override_dh_auto_install:
+	dh_auto_install
+	#rm -rf $(CURDIR)/debian/python3-certbot-haproxy/usr/lib/python*/dist-packages/certbot_haproxy/tests/testdata
 
-override_dh_install:
-	dh_install
-	mv debian/certbot-haproxy/usr/lib/python* debian/certbot-haproxy/usr/lib/python3
-	rm debian/certbot-haproxy/usr/lib/python3/dist-packages/certbot_haproxy/__pycache__/ -rf
-	rm debian/certbot-haproxy/usr/lib/python3/dist-packages/certbot_haproxy/tests/__pycache__/ -rf
-	mv debian/certbot-haproxy/usr/bin/certbot-deploy-hook-example	debian/certbot-haproxy/usr/bin/certbot-haproxy-deploy
-	chmod +x debian/certbot-haproxy/usr/bin/certbot-haproxy-deploy
+override_dh_gencontrol:
+	echo "Abi-major-version=${DEB_VERSION_UPSTREAM}" | cut -d. -f1 >> debian/abi.substvars
+	echo "Abi-major-minor-version=${DEB_VERSION_UPSTREAM}" | cut -d. -f1,2 >> debian/abi.substvars
+	dh_gencontrol -- -Tdebian/abi.substvars
+
+
+override_dh_auto_test:
+	echo "Skipping tests as there are none."

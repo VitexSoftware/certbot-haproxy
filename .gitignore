@@ -46,5 +46,13 @@ certbot.log
 # tmp files:
 *.swp
 
+.pybuild/
 debian/certbot-haproxy/
 debian/files
+debian/.debhelper/
+debian/abi.substvars
+debian/certbot-haproxy.debhelper.log
+debian/certbot-haproxy.postinst.debhelper
+debian/certbot-haproxy.prerm.debhelper
+debian/certbot-haproxy.substvars
+debian/debhelper-build-stamp

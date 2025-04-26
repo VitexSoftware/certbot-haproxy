@@ -1,9 +1,22 @@
 Source: certbot-haproxy
-Section: net
+Section: python
 Priority: optional
 Maintainer: Vítězslav Dvořák <info@vitexsoftware.cz>
-Build-Depends: debhelper-compat (= 12), dh-python, python3-setuptools,  python3, python3-mock, python3-sphinx-rtd-theme, python3-zope.component
-Standards-Version: 4.5.0
+Build-Depends: debhelper-compat (= 13),
+               dh-python,
+               python3,
+               python3-acme-abi-2 (>= 2.1),
+               python3-augeas,
+               python3-certbot-abi-2 (>= 2.1),
+               python3-configargparse,
+               python3-openssl,
+               python3-parsedatetime,
+               python3-pytest,
+               python3-requests,
+               python3-rfc3339,
+               python3-setuptools,
+               python3-tz,
+Standards-Version: 4.7.0
 Homepage: https://github.com/VitexSoftware/certbot-haproxy
 #Vcs-Git: https://salsa.debian.org/debian/certbot-haproxy.git
 #Vcs-Browser: https://salsa.debian.org/debian/certbot-haproxy
@@ -11,9 +24,13 @@ Homepage: https://github.com/VitexSoftware/certbot-haproxy
 Package: certbot-haproxy
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, haproxy, certbot, python3, python3-setuptools,  python3-mock, python3-future, python3-zope.component
-    ${shlibs:Depends}
-Description: HAProxy plugin for Let's Encrypt's Certbot 
+Depends: apache2,
+         certbot,
+         python3-certbot-abi-2 (>= ${Abi-major-minor-version}),
+         ${misc:Depends},
+         ${python3:Depends},
+         haproxy
+Description: HAProxy plugin for Let's Encrypt's Certbot
  This is a certbot plugin for using certbot in combination with a HAProxy setup. 
  Its advantage over using the standalone certbot is that it automatically places
  certificates in the correct directory and restarts HAProxy afterwards. 
