@@ -12,6 +12,7 @@ include /usr/share/dpkg/pkg-info.mk
 
 override_dh_auto_install:
 	dh_auto_install
+	mv debian/certbot-haproxy/usr/bin/certbot-deploy-hook-example debian/certbot-haproxy/usr/bin/certbot-haproxy-deploy
 	#rm -rf $(CURDIR)/debian/python3-certbot-haproxy/usr/lib/python*/dist-packages/certbot_haproxy/tests/testdata
 
 override_dh_gencontrol:

@@ -66,8 +66,12 @@ class HAProxyAuthenticator(standalone.Authenticator):
     description = "Certbot standalone authenticator with HAProxy preset."
 
     def __init__(self, *args, **kwargs):
-        super(HAProxyAuthenticator, self).__init__(*args, **kwargs)
-        self.config.http01_port = self.conf('haproxy_http_01_port')
+        super().__init__(*args, **kwargs)
+        self._haproxy_http_01_port = None
+
+    def prepare(self):
+        """Prepare the authenticator."""
+        self._haproxy_http_01_port = self.conf('haproxy_http_01_port')
 
     @classmethod
     def add_parser_arguments(cls, add):
