@@ -1,6 +1,13 @@
-certbot-haproxy (0.1) UNRELEASED; urgency=low
+certbot-haproxy (0.2.0) UNRELEASED; urgency=medium
 
+  * modernized
+
+ -- vitex <info@vitexsoftware.cz>  Sat, 26 Apr 2025 21:39:44 +0200
+
+certbot-haproxy (0.1) unstable; urgency=low
+
+  [ Vítězslav Dvořák ]
   * Initial release. Closes: #nnnn
     <nnnn is the bug number of your ITP>
 
- -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sun, 19 Jun 2022 22:52:11 +0200
+ -- vitex <info@vitexsoftware.cz>  Sat, 26 Apr 2025 21:39:34 +0200

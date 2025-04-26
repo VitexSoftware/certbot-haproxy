@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+import os
+import re
+import sys
+
+lineage = os.environ.get('RENEWED_LINEAGE')
+
+if not lineage:
+    sys.exit()
+
+result = re.match(r'.*/live/(.+)$', lineage)
+
+if not result:
+    sys.exit(1)
+
+domain = result.group(1)
+deploy_dir = "/etc/haproxy/ssl"
+deploy_path = f"{deploy_dir}/{domain}.pem"
+
+# Ensure target directory exists
+os.makedirs(deploy_dir, exist_ok=True)
+
+source_key = os.path.join(lineage, "privkey.pem")
+source_chain = os.path.join(lineage, "fullchain.pem")
+
+try:
+    with open(deploy_path, "w") as deploy, \
+         open(source_key, "r") as key, \
+         open(source_chain, "r") as chain:
+        deploy.write(key.read())
+        deploy.write(chain.read())
+    os.chmod(deploy_path, 0o600)
+except Exception as e:
+    print(f"Error deploying certificate: {e}", file=sys.stderr)
+    sys.exit(1)

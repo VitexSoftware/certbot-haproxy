@@ -1,2 +1,2 @@
 # You must remove unused comment lines for the released package.
-certbot-deploy-hook-example         /usr/bin/
+certbot-haproxy-deploy         /usr/bin/
