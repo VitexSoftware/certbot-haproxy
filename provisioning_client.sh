@@ -58,8 +58,8 @@ register-unsafely-without-email = True
 text = True
 debug = True
 verbose = True
-authenticator certbot-haproxy:haproxy-authenticator
-installer certbot-haproxy:haproxy-installer
+authenticator haproxy-authenticator
+installer haproxy-installer
 server http://boulder.local/directory
 EOF
 chown -R vagrant: /home/vagrant/.config/letsencrypt

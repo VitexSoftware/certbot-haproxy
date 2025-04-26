@@ -24,15 +24,16 @@ test_extras = [
 
 long_description = (
     "This is a plugin for Certbot, it enables automatically authenticating "
-    "domains ans retrieving certificates. It can also restart HAProxy after "
+    "domains and retrieving certificates. It can also restart HAProxy after "
     "new certificates are installed. However, it will not configure HAProxy "
-    "because. HAProxy is unlikely to be used for small/simple setups like what"
-    " Apache or NGiNX are more likely to be used for. HAProxy configurations "
+    "because HAProxy is unlikely to be used for small/simple setups like what"
+    " Apache or NginX are more likely to be used for. HAProxy configurations "
     "vary greatly, any configuration this plugin could define is most likely "
     "not applicable in your environment."
 )
 
 haproxy_authenticator = 'certbot_haproxy.authenticator:HAProxyAuthenticator'
+haproxy_installer = 'certbot_haproxy.installer:HaproxyInstaller'
 
 setup(
     name='certbot-haproxy',
@@ -75,6 +76,7 @@ setup(
     entry_points={
         'certbot.plugins': [
             'haproxy-authenticator = certbot_haproxy.authenticator:HAProxyAuthenticator',
+            'haproxy-installer = certbot_haproxy.installer:HaproxyInstaller',  # Added entry point for the installer
         ],
     },
 )
