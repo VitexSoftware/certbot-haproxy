@@ -32,7 +32,7 @@ class HaproxyInstaller(common.Installer):
 
     def deploy_cert(self, domain, cert_path, key_path, chain_path, fullchain_path):
         """
-        Deploy the certificate for the specified domain.
+        Deploy the certificate and private key for HAProxy.
 
         :param domain: Domain name
         :param cert_path: Path to the certificate file
@@ -43,14 +43,20 @@ class HaproxyInstaller(common.Installer):
         target_dir = "/etc/letsencrypt/haproxy_fullchains"
         os.makedirs(target_dir, exist_ok=True)
 
-        target_cert_path = os.path.join(target_dir, f"{domain}.crt")
-        target_key_path = os.path.join(target_dir, f"{domain}.key")
+        target_pem_path = os.path.join(target_dir, f"{domain}.pem")
 
         try:
-            # Copy the certificate and key to the target directory
-            shutil.copy2(fullchain_path, target_cert_path)
-            shutil.copy2(key_path, target_key_path)
-            logger.info(f"Deployed certificate and key for {domain} to {target_dir}")
+            with open(fullchain_path, 'rb') as cert_file:
+                cert_data = cert_file.read()
+            with open(key_path, 'rb') as key_file:
+                key_data = key_file.read()
+
+            # Sloučíme certifikát a klíč dohromady
+            with open(target_pem_path, 'wb') as pem_file:
+                pem_file.write(cert_data)
+                pem_file.write(key_data)
+
+            logger.info(f"Deployed combined cert and key for {domain} to {target_pem_path}")
         except Exception as e:
             logger.error(f"Failed to deploy certificate for {domain}: {e}")
             raise
@@ -97,3 +103,9 @@ class HaproxyInstaller(common.Installer):
         except subprocess.CalledProcessError:
             logger.error("Failed to restart HAProxy service.")
             raise
+
+
+    def get_all_names(self):
+        """Return all names that may be authenticated."""
+        # Installer obvykle nemá co autentizovat, vracíme prázdnou množinu.
+        return set()
