@@ -330,8 +330,7 @@ may try to install a certificate now.
 
 .. code:: bash
 
-    certbot certonly --authenticator certbot-haproxy:haproxy-authenticator \
-        --deploy-hook /path/to/your/install/script
+    certbot --authenticator haproxy-authenticator --installer haproxy-installer  -d jenkins.proxy.spojenet.cz
 
 If you want your ``certbot`` to always use our Authenticator, you
 can add this to your configuration file:
@@ -339,7 +338,8 @@ can add this to your configuration file:
 .. code:: bash
 
     cat <<EOF >> $HOME/.config/letsencrypt/cli.ini
-    authenticator=certbot-haproxy:haproxy-authenticator
+    authenticator=haproxy-authenticator
+    installer=haproxy-installer
     EOF
 
 If you need to run in unattended mode, there are a bunch of arguments you need
