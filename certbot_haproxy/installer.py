@@ -15,7 +15,11 @@ class HaproxyInstaller(common.Installer):
     @classmethod
     def add_parser_arguments(cls, add):
         """Add plugin-specific command-line arguments."""
-        add("haproxy-config-path", help="Path to the HAProxy configuration file")
+        add(
+            "haproxy-config-path",
+            default="/etc/haproxy/haproxy.cfg",
+            help="Path to the HAProxy configuration file (default: /etc/haproxy/haproxy.cfg)"
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,8 +27,21 @@ class HaproxyInstaller(common.Installer):
 
     def prepare(self):
         """Prepare the installer (e.g., check if HAProxy is installed)."""
-        if not self.config_path:
-            raise ValueError("HAProxy configuration path must be specified.")
+        if not os.path.isfile(self.config_path):
+            raise ValueError(f"HAProxy configuration file '{self.config_path}' does not exist.")
+
+        try:
+            result = subprocess.run(
+                ["haproxy", "-v"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True
+            )
+            haproxy_version = result.stdout.strip()
+            logger.info(f"Detected HAProxy version: {haproxy_version}")
+        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            logger.warning(f"Could not determine HAProxy version: {e}")
 
     def more_info(self):
         """Return a string with additional information about the plugin."""
@@ -62,13 +79,7 @@ class HaproxyInstaller(common.Installer):
             raise
 
     def enhance(self, domain, enhancement, options=None):
-        """
-        Enhance the configuration.
-
-        :param domain: Domain name
-        :param enhancement: Enhancement type
-        :param options: Additional options
-        """
+        """Enhance the configuration."""
         raise NotImplementedError("Enhancement logic is not implemented yet.")
 
     def supported_enhancements(self):
@@ -76,9 +87,8 @@ class HaproxyInstaller(common.Installer):
         return []
 
     def save(self, title=None, temporary=False):
-        """Save the configuration."""
-        # Implement logic to save HAProxy configuration
-        raise NotImplementedError("Save logic is not implemented yet.")
+        """Save the configuration (no-op for HAProxy)."""
+        logger.info("HAProxyInstaller.save() called, but no changes to save.")
 
     def rollback_checkpoints(self, rollback=1):
         """Rollback configuration to a previous checkpoint."""
@@ -87,7 +97,6 @@ class HaproxyInstaller(common.Installer):
     def config_test(self):
         """Test the HAProxy configuration."""
         try:
-            # Run HAProxy config test
             subprocess.run(["haproxy", "-c", "-f", self.config_path], check=True)
             logger.info("HAProxy configuration test passed.")
         except subprocess.CalledProcessError:
@@ -97,15 +106,12 @@ class HaproxyInstaller(common.Installer):
     def restart(self):
         """Restart the HAProxy service."""
         try:
-            # Restart HAProxy
             subprocess.run(["systemctl", "restart", "haproxy"], check=True)
             logger.info("HAProxy service restarted successfully.")
         except subprocess.CalledProcessError:
             logger.error("Failed to restart HAProxy service.")
             raise
 
-
     def get_all_names(self):
         """Return all names that may be authenticated."""
-        # Installer obvykle nemá co autentizovat, vracíme prázdnou množinu.
         return set()
