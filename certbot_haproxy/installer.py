@@ -57,7 +57,7 @@ class HaproxyInstaller(common.Installer):
         :param chain_path: Path to the chain file
         :param fullchain_path: Path to the full chain file
         """
-        target_dir = "/etc/letsencrypt/haproxy_fullchains"
+        target_dir = "/etc/haproxy/ssl"
         os.makedirs(target_dir, exist_ok=True)
 
         target_pem_path = os.path.join(target_dir, f"{domain}.pem")
@@ -68,7 +68,7 @@ class HaproxyInstaller(common.Installer):
             with open(key_path, 'rb') as key_file:
                 key_data = key_file.read()
 
-            # Sloučíme certifikát a klíč dohromady
+            # Combine the certificate and private key into a single PEM file
             with open(target_pem_path, 'wb') as pem_file:
                 pem_file.write(cert_data)
                 pem_file.write(key_data)
