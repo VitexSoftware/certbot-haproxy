@@ -72,6 +72,7 @@ class HAProxyAuthenticator(standalone.Authenticator):
     def prepare(self):
         """Prepare the authenticator."""
         self._haproxy_http_01_port = self.conf('haproxy_http_01_port')
+        logger.debug(f"Using haproxy_http_01_port: {self._haproxy_http_01_port}")
 
     @classmethod
     def add_parser_arguments(cls, add):
