@@ -24,6 +24,27 @@ os.makedirs(deploy_dir, exist_ok=True)
 source_key = os.path.join(lineage, "privkey.pem")
 source_chain = os.path.join(lineage, "fullchain.pem")
 
+# Parse haproxy.cfg to get user and group
+haproxy_cfg_path = "/haproxy/haproxy.cfg"
+user, group = None, None
+
+try:
+    with open(haproxy_cfg_path, "r") as cfg:
+        for line in cfg:
+            if line.strip().startswith("user"):
+                user = line.split()[1]
+            elif line.strip().startswith("group"):
+                group = line.split()[1]
+            if user and group:
+                break
+except Exception as e:
+    print(f"Error reading HAProxy config: {e}", file=sys.stderr)
+    sys.exit(1)
+
+if not user or not group:
+    print("User or group not found in HAProxy config", file=sys.stderr)
+    sys.exit(1)
+
 try:
     with open(deploy_path, "w") as deploy, \
          open(source_key, "r") as key, \
@@ -31,6 +52,7 @@ try:
         deploy.write(key.read())
         deploy.write(chain.read())
     os.chmod(deploy_path, 0o600)
+    os.chown(deploy_path, int(os.getpwnam(user).pw_uid), int(os.getgrnam(group).gr_gid))
 except Exception as e:
     print(f"Error deploying certificate: {e}", file=sys.stderr)
     sys.exit(1)
