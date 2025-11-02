@@ -46,6 +46,104 @@ is added in version 0.2.0+
 
 The example script for deploy is `certbot-deploy-hook-example`
 
+Certificate Deployment with certbot-haproxy-deploy
+---------------------------------------------------
+
+HAProxy requires certificates in a specific format: the private key and
+fullchain certificate must be combined into a single ``.pem`` file. The
+``certbot-haproxy-deploy`` script automates this process and is designed to be
+used as a Certbot deploy hook.
+
+How it works
+============
+
+When Certbot successfully renews or obtains a certificate, it can execute a
+deploy hook script. The ``certbot-haproxy-deploy`` script:
+
+1. **Detects renewed certificates**: Reads the ``RENEWED_LINEAGE`` environment
+   variable set by Certbot, which points to the certificate directory.
+
+2. **Combines certificate files**: Creates a single ``.pem`` file by combining:
+   
+   - ``privkey.pem`` (private key)
+   - ``fullchain.pem`` (certificate + chain)
+
+3. **Sets proper permissions**: Automatically reads your HAProxy configuration
+   (``/etc/haproxy/haproxy.cfg``) to determine the correct user and group, then:
+   
+   - Sets ownership to match HAProxy's user/group
+   - Sets permissions to ``0600`` for security
+
+4. **Atomic deployment**: Uses a temporary file with atomic rename to ensure
+   certificates are never partially written, preventing potential HAProxy issues.
+
+5. **Deploys to HAProxy directory**: Places the combined certificate in
+   ``/etc/haproxy/ssl/[domain].pem`` where HAProxy can load it.
+
+Usage
+=====
+
+The script is installed to ``/usr/bin/certbot-haproxy-deploy`` and should be
+used with Certbot's ``--deploy-hook`` option:
+
+.. code:: bash
+
+    certbot certonly \
+        --authenticator haproxy-authenticator \
+        --domain example.com \
+        --deploy-hook /usr/bin/certbot-haproxy-deploy
+
+For automatic renewal, configure your systemd service or cron job:
+
+.. code:: bash
+
+    # Systemd service example
+    ExecStart=/usr/bin/certbot renew -q --deploy-hook /usr/bin/certbot-haproxy-deploy
+
+The deploy hook only runs when certificates are successfully renewed, making it
+safe to use in automated renewal setups.
+
+Alternative: certbot-deploy-hook-example
+=========================================
+
+A simpler example script ``certbot-deploy-hook-example`` is also provided for
+reference. Unlike ``certbot-haproxy-deploy``, it:
+
+- Does not automatically detect HAProxy user/group
+- Does not set proper ownership/permissions
+- Does not use atomic file operations
+
+This example is intended for educational purposes or as a starting point for
+custom deployment scripts. For production use, ``certbot-haproxy-deploy`` is
+recommended.
+
+HAProxy Configuration
+=====================
+
+Ensure your HAProxy configuration is set to load certificates from the deploy
+directory:
+
+.. code::
+
+    frontend https-in
+        bind *:443 ssl crt /etc/haproxy/ssl/
+
+HAProxy will automatically load all ``.pem`` files from this directory. After
+deploying new certificates, HAProxy must be restarted or reloaded:
+
+.. code:: bash
+
+    systemctl reload haproxy
+
+You can add this as a post-hook to run after all renewals:
+
+.. code:: bash
+
+    certbot renew -q \
+        --deploy-hook /usr/bin/certbot-haproxy-deploy \
+        --post-hook "systemctl reload haproxy"
+
+
 
 Installing: Requirements
 ------------------------
@@ -388,7 +486,7 @@ after the server has been offline for a long time.
     [Service]
     Type=simple
     User=certbot
-    ExecStart=/usr/bin/certbot renew -q --deploy-hook /path/to/deploy/script
+    ExecStart=/usr/bin/certbot renew -q --deploy-hook /usr/bin/certbot-haproxy-deploy --post-hook "systemctl reload haproxy"
     EOF
 
     # Enable the timer and start it, this is not necessary for the service,

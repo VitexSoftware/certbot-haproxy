@@ -1,8 +1,14 @@
-certbot-haproxy (0.2.0) UNRELEASED; urgency=medium
+certbot-haproxy (0.2.1) UNRELEASED; urgency=medium
+
+  * permissions fix
+
+ -- vitex <info@vitexsoftware.cz>  Sun, 02 Nov 2025 21:44:06 +0100
+
+certbot-haproxy (0.2.0) unstable; urgency=medium
 
   * modernized
 
- -- vitex <info@vitexsoftware.cz>  Sat, 26 Apr 2025 21:39:44 +0200
+ -- vitex <info@vitexsoftware.cz>  Sun, 02 Nov 2025 21:43:46 +0100
 
 certbot-haproxy (0.1) unstable; urgency=low
 

@@ -5,9 +5,9 @@ Maintainer: Vítězslav Dvořák <info@vitexsoftware.cz>
 Build-Depends: debhelper-compat (= 13),
                dh-python,
                python3,
-               python3-acme-abi-2 (>= 2.1),
+               python3-acme-abi-2 (>= 2.1) | python3-acme (>= 2.1),
                python3-augeas,
-               python3-certbot-abi-2 (>= 2.1),
+               python3-certbot-abi-2 (>= 2.1) | python3-certbot (>= 2.1),
                python3-configargparse,
                python3-openssl,
                python3-parsedatetime,
@@ -26,7 +26,7 @@ Architecture: all
 Multi-Arch: foreign
 Depends: apache2,
          certbot,
-         python3-certbot-abi-2 (>= ${Abi-major-minor-version}),
+         python3-certbot-abi-2 (>= ${Abi-major-minor-version}) | python3-certbot (>= ${Abi-major-minor-version}),
          ${misc:Depends},
          ${python3:Depends},
          haproxy
