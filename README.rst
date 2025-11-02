@@ -84,12 +84,31 @@ Usage
 =====
 
 The script is installed to ``/usr/bin/certbot-haproxy-deploy`` and should be
-used with Certbot's ``--deploy-hook`` option:
+used with Certbot's ``--deploy-hook`` option.
+
+Using the HAProxy Authenticator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The HAProxy authenticator plugin uses port 8000 by default (configurable):
 
 .. code:: bash
 
     certbot certonly \
         --authenticator haproxy-authenticator \
+        --haproxy-authenticator-haproxy-http-01-port 8000 \
+        --domain example.com \
+        --deploy-hook /usr/bin/certbot-haproxy-deploy
+
+Using Standalone Authenticator
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alternatively, you can use the standard standalone authenticator with a custom port:
+
+.. code:: bash
+
+    certbot certonly \
+        --authenticator standalone \
+        --http-01-port 8000 \
         --domain example.com \
         --deploy-hook /usr/bin/certbot-haproxy-deploy
 
@@ -97,8 +116,16 @@ For automatic renewal, configure your systemd service or cron job:
 
 .. code:: bash
 
-    # Systemd service example
-    ExecStart=/usr/bin/certbot renew -q --deploy-hook /usr/bin/certbot-haproxy-deploy
+    # Systemd service example with haproxy-authenticator
+    ExecStart=/usr/bin/certbot renew -q \
+        --deploy-hook /usr/bin/certbot-haproxy-deploy \
+        --post-hook "systemctl reload haproxy"
+
+    # Or with standalone authenticator
+    ExecStart=/usr/bin/certbot renew -q \
+        --cert-name example.com \
+        --deploy-hook /usr/bin/certbot-haproxy-deploy \
+        --post-hook "systemctl reload haproxy"
 
 The deploy hook only runs when certificates are successfully renewed, making it
 safe to use in automated renewal setups.

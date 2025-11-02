@@ -1,3 +1,13 @@
+certbot-haproxy (0.2.2) UNRELEASED; urgency=medium
+
+  * Fix haproxy-authenticator to properly use --haproxy-authenticator-haproxy-http-01-port option
+  * Add certbot-haproxy-deploy script with automatic HAProxy user/group detection
+  * Add comprehensive deployment documentation
+  * Restore certbot-deploy-hook-example for reference
+  * Fix debian package dependencies for broader compatibility
+
+ -- vitex <info@vitexsoftware.cz>  Sun, 02 Nov 2025 23:23:00 +0100
+
 certbot-haproxy (0.2.1) UNRELEASED; urgency=medium
 
   * permissions fix

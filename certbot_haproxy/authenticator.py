@@ -67,12 +67,15 @@ class HAProxyAuthenticator(standalone.Authenticator):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._haproxy_http_01_port = None
 
     def prepare(self):
         """Prepare the authenticator."""
-        self._haproxy_http_01_port = self.conf('haproxy_http_01_port')
-        logger.debug(f"Using haproxy_http_01_port: {self._haproxy_http_01_port}")
+        super().prepare()
+        # Override the http01_port from config with our haproxy-specific port
+        haproxy_port = self.conf('haproxy_http_01_port')
+        if haproxy_port is not None:
+            self.config.http01_port = haproxy_port
+            logger.debug(f"Using haproxy_http_01_port: {haproxy_port}")
 
     @classmethod
     def add_parser_arguments(cls, add):
