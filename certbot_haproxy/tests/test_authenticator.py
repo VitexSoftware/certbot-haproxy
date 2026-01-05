@@ -1,5 +1,5 @@
 import unittest
-import mock
+from unittest import mock
 import os
 
 from certbot_haproxy.authenticator import HAProxyAuthenticator
@@ -34,3 +34,39 @@ class TestAuthenticator(unittest.TestCase):
         chal = self.authenticator.supported_challenges
         self.assertIsInstance(chal, list)
         self.assertTrue(challenges.HTTP01 in chal)
+
+    @mock.patch("certbot_haproxy.authenticator._test_port_availability")
+    def test_prepare_with_port_configuration(self, mock_port_test):
+        """Test that prepare() correctly configures the port"""
+        mock_port_test.return_value.__enter__ = mock.Mock(return_value=None)
+        mock_port_test.return_value.__exit__ = mock.Mock(return_value=None)
+        
+        # Mock the conf method to return a specific port
+        self.authenticator.conf = mock.Mock(return_value=8000)
+        
+        # Call prepare
+        self.authenticator.prepare()
+        
+        # Check that the config was updated
+        self.assertEqual(self.authenticator.config.http01_port, 8000)
+        
+        # Check that port availability was tested
+        mock_port_test.assert_called_once_with(8000)
+
+    @mock.patch("certbot_haproxy.authenticator._test_port_availability")
+    def test_prepare_with_default_port(self, mock_port_test):
+        """Test that prepare() uses default port when none configured"""
+        mock_port_test.return_value.__enter__ = mock.Mock(return_value=None)
+        mock_port_test.return_value.__exit__ = mock.Mock(return_value=None)
+        
+        # Mock the conf method to return None (no port configured)
+        self.authenticator.conf = mock.Mock(return_value=None)
+        
+        # Call prepare
+        self.authenticator.prepare()
+        
+        # Check that the default port was used
+        self.assertEqual(self.authenticator.config.http01_port, 8000)
+        
+        # Check that port availability was tested
+        mock_port_test.assert_called_once_with(8000)

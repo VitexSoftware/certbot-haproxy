@@ -45,17 +45,51 @@ with this authenticator, read the documentation of the
 `.certbot_haproxy.installer`
 """
 import logging
+import socket
+from contextlib import contextmanager
 
 import zope.component
 import zope.interface
 
 from acme import challenges
-
+from certbot import errors
 from certbot import interfaces
 from certbot.plugins import common
 from certbot._internal.plugins import standalone
 
 logger = logging.getLogger(__name__)  # pylint:disable=invalid-name
+
+
+@contextmanager
+def _test_port_availability(port, host='127.0.0.1'):
+    """Test if a port is available for binding.
+    
+    Args:
+        port (int): Port number to test
+        host (str): Host to bind to, defaults to localhost
+        
+    Raises:
+        errors.PluginError: If port is not available
+    """
+    sock = None
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.bind((host, port))
+        yield
+    except OSError as e:
+        if e.errno == 98:  # Address already in use
+            raise errors.PluginError(
+                f"Could not bind to port {port} on {host}. "
+                f"Port is already in use. If HAProxy is running on port 80, "
+                f"make sure you're using a different port (like 8000) for the authenticator "
+                f"and that HAProxy forwards /.well-known/acme-challenge/ requests to it."
+            )
+        else:
+            raise errors.PluginError(f"Could not bind to port {port} on {host}: {e}")
+    finally:
+        if sock:
+            sock.close()
 
 
 @zope.interface.implementer(interfaces.IAuthenticator)
@@ -72,10 +106,34 @@ class HAProxyAuthenticator(standalone.Authenticator):
         """Prepare the authenticator."""
         super().prepare()
         # Override the http01_port from config with our haproxy-specific port
+        # The CLI arg --haproxy-authenticator-haproxy-http-01-port becomes 'haproxy_http_01_port' in config
         haproxy_port = self.conf('haproxy_http_01_port')
         if haproxy_port is not None:
             self.config.http01_port = haproxy_port
-            logger.debug(f"Using haproxy_http_01_port: {haproxy_port}")
+            logger.info(f"Using HAProxy authenticator port: {haproxy_port}")
+        else:
+            # Fallback to default if not set
+            default_port = 8000
+            self.config.http01_port = default_port
+            logger.info(f"Using default HAProxy authenticator port: {default_port}")
+        
+        logger.debug(f"Final http01_port configuration: {self.config.http01_port}")
+        
+        # Validate that the configured port is available
+        try:
+            with _test_port_availability(self.config.http01_port):
+                logger.debug(f"Port {self.config.http01_port} is available for binding")
+        except errors.PluginError as e:
+            # Provide more helpful error message
+            if self.config.http01_port == 80:
+                raise errors.PluginError(
+                    f"The HAProxy authenticator is trying to bind to port 80, which is likely "
+                    f"used by HAProxy itself. Please use --haproxy-authenticator-haproxy-http-01-port "
+                    f"with a different port (e.g., 8000) and configure HAProxy to forward "
+                    f"/.well-known/acme-challenge/ requests to that port."
+                )
+            else:
+                raise
 
     @classmethod
     def add_parser_arguments(cls, add):
@@ -93,8 +151,9 @@ class HAProxyAuthenticator(standalone.Authenticator):
         add(
             "haproxy-http-01-port",
             help=(
-                "Port to open internally (default=8000), you're expected to"
-                " forward requests to port 80 to it."
+                "Port for the HAProxy authenticator to bind to internally (default: 8000). "
+                "HAProxy should forward /.well-known/acme-challenge/ requests from port 80 "
+                "to this port. Do NOT use port 80 if HAProxy is already using it."
             ),
             type=int,
             default=8000
@@ -121,8 +180,8 @@ class HAProxyAuthenticator(standalone.Authenticator):
             "This authenticator creates its own ephemeral TCP listener"
             " on the configured internal port (default=8000) in order to"
             " respond to incoming http-01 challenges from the certificate"
-            " authority. In order for this port to be reached, you need to"
-            " configure HAProxy to forward any requests to any domain on the"
-            " http-01 port (default:80), ending in"
-            " `/.well-known/acme-challenge/` to the http-01 port (hint:8000)."
+            " authority. HAProxy must be configured to forward requests to"
+            " /.well-known/acme-challenge/ from port 80 to the configured port."
+            " IMPORTANT: Do not use port 80 for the authenticator if HAProxy"
+            " is already using it - use port 8000 or another available port."
         )

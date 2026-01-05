@@ -3,6 +3,21 @@ HAProxy plugin for Certbot
 
 .. contents:: Table of Contents
 
+🔧 Recent Fixes (Critical Issues Resolved)
+------------------------------------------
+
+**Version 2.11.0+ includes important fixes for certificate renewal issues:**
+
+- **Fixed port binding problem**: The plugin now correctly respects the ``--haproxy-authenticator-haproxy-http-01-port`` parameter instead of defaulting to port 80
+- **Improved error handling**: Better error messages when port conflicts occur, with specific guidance for HAProxy users
+- **Enhanced validation**: Added port availability checking and clearer configuration validation
+- **Added troubleshooting tools**: New validation script (``validate-haproxy-config.sh``) and comprehensive troubleshooting guide
+
+**Migration from older versions:**
+- Update renewal configurations to use the correct port parameter
+- Test with ``--dry-run`` before running actual renewals
+- Use the validation script to verify your HAProxy configuration
+
 About
 -----
 
@@ -615,6 +630,88 @@ Requirements:
 
 - python stdeb: pip install --upgrade stdeb
 - dh clean: apt-get install dh-make
+
+Troubleshooting
+===============
+
+Common Issues and Quick Fixes
+------------------------------
+
+**"Could not bind TCP port 80" error**:
+
+.. code:: bash
+
+    # Ensure you're using a custom port, not port 80
+    certbot certonly \
+        --authenticator haproxy-authenticator \
+        --haproxy-authenticator-haproxy-http-01-port 8000 \
+        -d example.com
+
+**Port already in use**:
+
+.. code:: bash
+
+    # Check what's using the port
+    sudo netstat -tulpn | grep :8000
+    
+    # Use a different port if needed
+    --haproxy-authenticator-haproxy-http-01-port 8080
+
+**HAProxy configuration validation**:
+
+.. code:: bash
+
+    # Use the validation script
+    ./validate-haproxy-config.sh -p 8000 -c /etc/haproxy/haproxy.cfg
+
+**Certificate renewal failures**: Check your renewal configuration:
+
+.. code:: bash
+
+    sudo cat /etc/letsencrypt/renewal/example.com.conf
+    
+    # Should contain:
+    # haproxy_authenticator_haproxy_http_01_port = 8000
+
+For detailed troubleshooting information, see ``TROUBLESHOOTING.md``.
+
+Required HAProxy Configuration
+------------------------------
+
+Your HAProxy configuration must forward ACME challenges to the authenticator:
+
+.. code::
+
+    frontend http-in
+        bind *:80
+        
+        # ACME challenge handling - MUST come before other rules
+        acl is_certbot path_beg -i /.well-known/acme-challenge
+        use_backend certbot if is_certbot
+        
+        # Your other rules
+        default_backend your_servers
+
+    backend certbot
+        log global
+        mode http
+        server certbot 127.0.0.1:8000
+
+Validation Tools
+----------------
+
+Use the provided validation script to check your setup:
+
+.. code:: bash
+
+    # Basic validation
+    ./validate-haproxy-config.sh
+    
+    # Custom port and config
+    ./validate-haproxy-config.sh -p 8000 -c /etc/haproxy/haproxy.cfg
+    
+    # With custom test domain
+    ./validate-haproxy-config.sh -d mydomain.com -p 8000
 
 Run the following commands in your vagrant machine:
 
