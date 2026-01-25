@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.vitexsoftware.certbot_haproxy</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>certbot-haproxy</name>
+  <summary>HAProxy plugin for Let's Encrypt's Certbot</summary>
+  <description>
+    <p>
+      This is a certbot plugin for using certbot in combination with a HAProxy setup. Its advantage over using the standalone certbot is that it automatically places certificates in the correct directory and restarts HAProxy afterwards. It should also enable you to very easily do automatic certificate renewal.
+    </p>
+  </description>
+  <categories>
+    <category>Utility</category>
+  </categories>
+  <url type="homepage">https://github.com/VitexSoftware/certbot-haproxy</url>
+  <url type="bugtracker">https://github.com/VitexSoftware/certbot-haproxy/issues</url>
+  <developer id="cz.vitexsoftware">
+    <name>VitexSoftware</name>
+  </developer>
+  <content_rating type="oars-1.1"/>
+</component>
