@@ -1,3 +1,4 @@
 include LICENSE.txt
 include README.rst
+include certbot-haproxy.ini
 recursive-include docs *

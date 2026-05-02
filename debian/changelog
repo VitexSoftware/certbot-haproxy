@@ -5,6 +5,7 @@ certbot-haproxy (0.2.2) UNRELEASED; urgency=medium
   * Add comprehensive deployment documentation
   * Restore certbot-deploy-hook-example for reference
   * Fix debian package dependencies for broader compatibility
+  * Install certbot-haproxy.ini into /etc/letsencrypt by default
 
  -- vitex <info@vitexsoftware.cz>  Sun, 02 Nov 2025 23:23:00 +0100
 
