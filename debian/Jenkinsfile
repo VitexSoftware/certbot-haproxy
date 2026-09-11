@@ -4,9 +4,7 @@
 
 String[] distributions = [
 			'debian:trixie', 
-			// 'debian:forky', // Disabled: Forky is still unstable/research-only.
-			//                 // The full Debian package ecosystem is not yet available for Forky.
-			//                 // Re-enable once the stack builds cleanly for Forky.
+			'debian:forky',
 			'ubuntu:noble',
 			'ubuntu:resolute',
 ]
@@ -26,6 +24,7 @@ properties([
 node() {
     ansiColor('xterm') {
         stage('SCM Checkout') {
+            sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
             checkout scm
         }
     }
@@ -47,6 +46,7 @@ distributions.each { distro ->
         node {
             ansiColor('xterm') {
                 stage('Checkout ' + distroName) {
+                    sh 'sudo chown -R jenkins:jenkins . 2>/dev/null || true'
                     checkout scm
                     def imageName = vendor + '/' + distro
                     buildImage = docker.image(imageName)
